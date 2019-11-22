@@ -1,7 +1,16 @@
 # Facepunch.Steamworks
 Another fucking c# Steamworks implementation
 
-[![Build Status](http://build.facepunch.com/buildStatus/icon?job=Facepunch/Facepunch.Steamworks/master)](http://build.facepunch.com/job/Facepunch/job/Facepunch.Steamworks/job/master/)
+## Installation:
+**Easy way:**\
+1. Add `"com.ks.uxmltocsharp": "https://github.com/kamyker/UnityUxmlToCsharp.git"` to `<your_project>/Packages/manifest.json` dependencies\
+**Git way:**\
+1. Clone repo as submodule to `<your_project>/Packages/Facepunch.Steamworks`
+
+2. Set proper Scription Define Symbols in Unity Player settings, for Winx64:
+`PLATFORM_WIN64;PLATFORM_WIN;PLATFORM_64`
+
+If you are using Mac or Linux and build isn't working check libraries settings in `Packages\Facepunch.Steamworks\UnityPlugin\redistributable_bin`
 
 ## Features
 

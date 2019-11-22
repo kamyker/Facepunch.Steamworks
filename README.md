@@ -6,7 +6,7 @@ Another fucking c# Steamworks implementation
 **Easy way:**
 1. Add 
 `
-"com.ks.uxmltocsharp": "https://github.com/kamyker/Facepunch.Steamworks.git"
+"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.git"
 ` 
 to 
 `

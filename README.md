@@ -2,9 +2,11 @@
 Another fucking c# Steamworks implementation
 
 ## Installation:
-**Easy way:**\
-1. Add `"com.ks.uxmltocsharp": "https://github.com/kamyker/UnityUxmlToCsharp.git"` to `<your_project>/Packages/manifest.json` dependencies\
-**Git way:**\
+
+**Easy way:**
+1. Add `"com.ks.uxmltocsharp": "https://github.com/kamyker/UnityUxmlToCsharp.git"` to `<your_project>/Packages/manifest.json` dependencies
+
+**Git way:**
 1. Clone repo as submodule to `<your_project>/Packages/Facepunch.Steamworks`
 
 2. Set proper Scription Define Symbols in Unity Player settings, for Winx64:

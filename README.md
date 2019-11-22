@@ -3,22 +3,18 @@ Another fucking c# Steamworks implementation
 
 ## Installation:
 1. Adding plugin
+
 **Easy way:**
- Add 
- 
-`
-"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.git"
-` 
+Add 
+ `"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.git"` 
 to 
-`
-<your_project>/Packages/manifest.json
-` 
+`<your_project>/Packages/manifest.json` 
 dependencies
 
 **Git way:**
 Clone repo as submodule to `<your_project>/Packages/Facepunch.Steamworks`
 
-2. Set proper Scription Define Symbols in Unity Player settings
+2. Set proper Scription Define Symbols in Unity Player settings:
 
 Win x64:
 

@@ -2,7 +2,7 @@
 Another fucking c# Steamworks implementation
 
 ## Installation:
-1.
+1. Adding plugin
 **Easy way:**
  Add 
  

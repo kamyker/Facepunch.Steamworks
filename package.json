@@ -1,0 +1,12 @@
+{
+	"name": "facepunch.steamworks",
+	"version": "1.0.0",
+	"displayName": "facepunch.steamworks",
+	"description": "https://github.com/Facepunch/Facepunch.Steamworks",
+	"unity": "2019.1",
+	"keywords": [
+	],
+	"author": {
+		"name": "facepunch"
+	}
+}

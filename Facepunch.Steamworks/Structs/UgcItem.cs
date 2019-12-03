@@ -260,7 +260,7 @@ namespace Steamworks.Ugc
 		/// If CancellationToken is default then there is 60 seconds timeout
 		/// Progress will be set to 0-1
 		/// </summary>
-		public async Task<bool> SubscribeDownloadAsync( Action<float> progress = null, CancellationToken ct = default, int milisecondsUpdateDelay = 30 )
+		public async Task<bool> SubscribeDownloadAsync( Action<float> progress = null, CancellationToken ct = default, int milisecondsUpdateDelay = 60 )
 		{
 			if ( ct == default )
 				ct = new CancellationTokenSource( TimeSpan.FromSeconds( 60 ) ).Token;

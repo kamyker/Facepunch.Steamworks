@@ -86,6 +86,33 @@ namespace Steamworks.Ugc
 			KeyValueTags.Add(key, value);
 			return this;
 		}
+		public async Task<PublishResult> CreateAsync( )
+		{
+			var result = default( PublishResult );
+			if ( consumerAppId == 0 )
+				consumerAppId = SteamClient.AppId;
+
+			return await CreateAsyncCore( result );
+		}
+
+		private async Task<PublishResult> CreateAsyncCore( PublishResult result )
+		{
+			result.Result = Steamworks.Result.Fail;
+
+			var created = await SteamUGC.Internal.CreateItem( consumerAppId, creatingType );
+			if ( !created.HasValue ) return result;
+
+			result.Result = created.Value.Result;
+
+			if ( result.Result != Steamworks.Result.OK )
+				return result;
+
+			fileId = created.Value.PublishedFileId;
+			result.NeedsWorkshopAgreement = created.Value.UserNeedsToAcceptWorkshopLegalAgreement;
+			result.FileId = fileId;
+
+			return result;
+		}
 
 		public async Task<PublishResult> SubmitAsync( IProgress<float> progress = null )
 		{
@@ -101,19 +128,7 @@ namespace Steamworks.Ugc
 			//
 			if ( creatingNew )
 			{
-				result.Result = Steamworks.Result.Fail;
-
-				var created = await SteamUGC.Internal.CreateItem( consumerAppId, creatingType );
-				if ( !created.HasValue ) return result;
-
-				result.Result = created.Value.Result;
-
-				if ( result.Result != Steamworks.Result.OK )
-					return result;
-
-				fileId = created.Value.PublishedFileId;
-				result.NeedsWorkshopAgreement = created.Value.UserNeedsToAcceptWorkshopLegalAgreement;
-				result.FileId = fileId;
+				result = await CreateAsyncCore( result );
 			}
 
 

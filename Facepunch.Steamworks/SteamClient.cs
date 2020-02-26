@@ -17,6 +17,9 @@ namespace Steamworks
 		/// </summary>
 		public static void Init( uint appid, bool asyncCallbacks = true )
 		{
+			if ( initialized )
+				throw new System.Exception( "Calling SteamClient.Init but is already initialized" );
+
 			System.Environment.SetEnvironmentVariable( "SteamAppId", appid.ToString() );
 			System.Environment.SetEnvironmentVariable( "SteamGameId", appid.ToString() );
 
@@ -102,10 +105,9 @@ namespace Steamworks
 
 		internal static void Cleanup()
 		{
-			Dispatch.Wipe();
+			Dispatch.ShutdownClient();
 
 			initialized = false;
-
 			ShutdownInterfaces();
 		}
 

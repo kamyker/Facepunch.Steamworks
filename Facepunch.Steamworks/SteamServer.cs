@@ -61,6 +61,9 @@ namespace Steamworks
 		/// </summary>
 		public static void Init( AppId appid, SteamServerInit init, bool asyncCallbacks = true )
 		{
+			if ( IsValid )
+				throw new System.Exception( "Calling SteamServer.Init but is already initialized" );
+
 			uint ipaddress = 0; // Any Port
 
 			if ( init.SteamPort == 0 )
@@ -145,6 +148,8 @@ namespace Steamworks
 
 		public static void Shutdown()
 		{
+			Dispatch.ShutdownServer();
+
 			ShutdownInterfaces();
 			SteamGameServer.Shutdown();
 		}

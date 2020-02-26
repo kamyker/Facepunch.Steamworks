@@ -45,15 +45,24 @@ namespace Steamworks
 			switch ( data.State )
 			{
 				case ConnectionState.Connecting:
-					OnConnecting( connection, data );
+					if ( !Connecting.Contains( connection ) )
+					{
+						OnConnecting( connection, data );
+					}
 					break;
 				case ConnectionState.Connected:
-					OnConnected( connection, data );
+					if ( !Connected.Contains( connection ) )
+					{
+						OnConnected( connection, data );
+					}
 					break;
 				case ConnectionState.ClosedByPeer:
 				case ConnectionState.ProblemDetectedLocally:
 				case ConnectionState.None:
-					OnDisconnected( connection, data );
+					if ( Connecting.Contains( connection ) || Connected.Contains( connection ) )
+					{
+						OnDisconnected( connection, data );
+					}
 					break;
 			}
 		}
@@ -65,8 +74,6 @@ namespace Steamworks
 		{
 			connection.Accept();
 			Connecting.Add( connection );
-
-			SteamNetworkingSockets.Internal.SetConnectionPollGroup( connection, pollGroup );
 		}
 
 		/// <summary>
@@ -76,6 +83,7 @@ namespace Steamworks
 		{
 			Connecting.Remove( connection );
 			Connected.Add( connection );
+			SteamNetworkingSockets.Internal.SetConnectionPollGroup( connection, pollGroup );
 		}
 
 		/// <summary>
@@ -83,6 +91,8 @@ namespace Steamworks
 		/// </summary>
 		public virtual void OnDisconnected( Connection connection, ConnectionInfo data )
 		{
+			SteamNetworkingSockets.Internal.SetConnectionPollGroup( connection, 0 );
+
 			connection.Close();
 
 			Connecting.Remove( connection );
@@ -128,7 +138,7 @@ namespace Steamworks
 				//
 				// Releases the message
 				//
-				msg.Release( msgPtr );
+				NetMsg.InternalRelease( (NetMsg*) msgPtr );
 			}
 		}
 

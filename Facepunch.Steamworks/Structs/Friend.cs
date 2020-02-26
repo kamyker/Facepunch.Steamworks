@@ -51,7 +51,7 @@ namespace Steamworks
 		/// Sometimes we don't know the user's name. This will wait until we have
 		/// downloaded the information on this user.
 		/// </summary>
-		public async Task RequestInfoAsync( int timeout = 5000 )
+		public async Task RequestInfoAsync()
 		{
 			await SteamFriends.CacheUserInformationAsync( Id, true );
 		}
@@ -99,7 +99,7 @@ namespace Steamworks
 		{
 			get
 			{
-				FriendGameInfo_t gameInfo = default( FriendGameInfo_t );
+				FriendGameInfo_t gameInfo = default;
 				if ( !SteamFriends.Internal.GetFriendGamePlayed( Id, ref gameInfo ) )
 					return null;
 
@@ -189,7 +189,7 @@ namespace Steamworks
 		/// Tries to get download the latest user stats
 		/// </summary>
 		/// <returns>True if successful, False if failure</returns>
-		public async Task<bool> RequestUserStats()
+		public async Task<bool> RequestUserStatsAsync()
 		{
 			var result = await SteamUserStats.Internal.RequestUserStats( Id );
 			return result.HasValue && result.Value.Result == Result.OK;

@@ -195,7 +195,7 @@ namespace Steamworks
 		/// </summary>
 		public static bool GetAllItems()
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 			return Internal.GetAllItems( ref sresult );
 		}
 
@@ -204,7 +204,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> GetAllItemsAsync()
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			if ( !Internal.GetAllItems( ref sresult ) )
 				return null;
@@ -220,7 +220,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> GenerateItemAsync( InventoryDef target, int amount )
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			var defs = new InventoryDefId[] { target.Id };
 			var cnts = new uint[] { (uint)amount };
@@ -238,7 +238,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> CraftItemAsync( InventoryItem[] list, InventoryDef target )
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			var give = new InventoryDefId[] { target.Id };
 			var givec = new uint[] { 1 };
@@ -259,7 +259,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> CraftItemAsync( InventoryItem.Amount[] list, InventoryDef target )
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			var give = new InventoryDefId[] { target.Id };
 			var givec = new uint[] { 1 };
@@ -301,7 +301,7 @@ namespace Steamworks
 			{
 				Marshal.Copy( data, 0, ptr, dataLength );
 
-				var sresult = default( SteamInventoryResult_t );
+				var sresult = Defines.k_SteamInventoryResultInvalid;
 
 				if ( !Internal.DeserializeResult( ref sresult, (IntPtr)ptr, (uint)dataLength, false ) )
 					return null;
@@ -322,7 +322,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> GrantPromoItemsAsync()
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			if ( !Internal.GrantPromoItems( ref sresult ) )
 				return null;
@@ -336,7 +336,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> TriggerItemDropAsync( InventoryDefId id )
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			if ( !Internal.TriggerItemDrop( ref sresult, id ) )
 				return null;
@@ -350,7 +350,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<InventoryResult?> AddPromoItemAsync( InventoryDefId id )
 		{
-			var sresult = default( SteamInventoryResult_t );
+			var sresult = Defines.k_SteamInventoryResultInvalid;
 
 			if ( !Internal.AddPromoItem( ref sresult, id ) )
 				return null;

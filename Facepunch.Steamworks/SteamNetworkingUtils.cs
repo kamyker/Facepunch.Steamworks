@@ -177,6 +177,17 @@ namespace Steamworks
 			set => SetConfigInt( NetConfig.TimeoutConnected, value );
 		}
 
+		/// <summary>
+		/// Upper limit of buffered pending bytes to be sent.
+		/// If this is reached SendMessage will return LimitExceeded.
+		/// Default is 524288 bytes (512k)
+		/// </summary>
+		public static int SendBufferSize
+		{
+			get => GetConfigInt( NetConfig.SendBufferSize );
+			set => SetConfigInt( NetConfig.SendBufferSize, value );
+		}
+
 
 		/// <summary>
 		/// Get Debug Information via OnDebugOutput event
@@ -222,6 +233,7 @@ namespace Steamworks
 		/// <summary>
 		/// This can be called from other threads - so we're going to queue these up and process them in a safe place.
 		/// </summary>
+		[MonoPInvokeCallback]
 		private static void OnDebugMessage( NetDebugOutput nType, IntPtr str )
 		{
 			debugMessages.Enqueue( new DebugMessage { Type = nType, Msg = Helpers.MemoryToString( str ) } );

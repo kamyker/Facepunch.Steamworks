@@ -27,6 +27,14 @@ namespace Steamworks
 		/// </summary>
 		public static Action<CallbackType, string, bool> OnDebugCallback;
 
+		/// <summary>
+		/// Called if an exception happens during a callback/callresult.
+		/// This is needed because the exception isn't always accessible when running
+		/// async.. and can fail silently. With this hooked you won't be stuck wondering
+		/// what happened.
+		/// </summary>
+		public static Action<Exception> OnException;
+
 		#region interop
 		[DllImport( Platform.LibraryName, EntryPoint = "SteamAPI_ManualDispatch_Init", CallingConvention = CallingConvention.Cdecl )]
 		internal static extern void SteamAPI_ManualDispatch_Init();
@@ -65,35 +73,65 @@ namespace Steamworks
 			SteamAPI_ManualDispatch_Init();
 		}
 
+		/// <summary>
+		/// Make sure we don't call Frame in a callback - because that'll cause some issues for everyone.
+		/// </summary>
+		static bool runningFrame = false;
 
 		/// <summary>
 		/// Calls RunFrame and processes events from this Steam Pipe
 		/// </summary>
 		internal static void Frame( HSteamPipe pipe )
-		{ 
-			SteamAPI_ManualDispatch_RunFrame( pipe );
-			SteamNetworkingUtils.OutputDebugMessages();
+		{
+			if ( runningFrame )
+				return;
 
-			CallbackMsg_t msg = default;
-
-			while ( SteamAPI_ManualDispatch_GetNextCallback( pipe, ref msg ) )
+			try
 			{
-				try
+				runningFrame = true;
+
+				SteamAPI_ManualDispatch_RunFrame( pipe );
+				SteamNetworkingUtils.OutputDebugMessages();
+
+				CallbackMsg_t msg = default;
+
+				while ( SteamAPI_ManualDispatch_GetNextCallback( pipe, ref msg ) )
 				{
-					ProcessCallback( msg, pipe == ServerPipe );
-				}
-				finally
-				{
-					SteamAPI_ManualDispatch_FreeLastCallback( pipe );
+					try
+					{
+						ProcessCallback( msg, pipe == ServerPipe );
+					}
+					finally
+					{
+						SteamAPI_ManualDispatch_FreeLastCallback( pipe );
+					}
 				}
 			}
+			catch ( System.Exception e )
+			{
+				OnException?.Invoke( e );
+			}
+			finally
+			{
+				runningFrame = false;
+			}
 		}
+
+		/// <summary>
+		/// To be safe we don't call the continuation functions while iterating
+		/// the Callback list. This is maybe overly safe because the only way this
+		/// could be an issue is if the callback list is modified in the continuation
+		/// which would only happen if starting or shutting down in the callback.
+		/// </summary>
+		static List<Action<IntPtr>> actionsToCall = new List<Action<IntPtr>>();
 
 		/// <summary>
 		/// A callback is a general global message
 		/// </summary>
 		private static void ProcessCallback( CallbackMsg_t msg, bool isServer )
 		{
+			OnDebugCallback?.Invoke( msg.Type, CallbackToString( msg.Type, msg.Data, msg.DataSize ), isServer );
+
 			// Is this a special callback telling us that the call result is ready?
 			if ( msg.Type == CallbackType.SteamAPICallCompleted )
 			{
@@ -101,40 +139,54 @@ namespace Steamworks
 				return;
 			}
 
-			if ( OnDebugCallback != null )
-			{
-				OnDebugCallback( msg.Type, CallbackToString( msg ), isServer );
-			}
-
 			if ( Callbacks.TryGetValue( msg.Type, out var list ) )
 			{
+				actionsToCall.Clear();
+
 				foreach ( var item in list )
 				{
 					if ( item.server != isServer )
 						continue;
 
-					item.action( msg.Data );
+					actionsToCall.Add( item.action );
 				}
+
+				foreach ( var action in actionsToCall )
+				{
+					action( msg.Data );
+				}
+
+				actionsToCall.Clear();
 			}
 		}
 
 		/// <summary>
 		/// Given a callback, try to turn it into a string
 		/// </summary>
-		private static string CallbackToString( CallbackMsg_t msg )
+		internal static string CallbackToString( CallbackType type, IntPtr data, int expectedsize )
 		{
-			if ( !CallbackTypeFactory.All.TryGetValue( msg.Type, out var t ) )
-				return "[not in sdk]";
+			if ( !CallbackTypeFactory.All.TryGetValue( type, out var t ) )
+				return $"[{type} not in sdk]";
 
-			var strct = msg.Data.ToType( t );
+			var strct = data.ToType( t );
 			if ( strct == null )
 				return "[null]";
 
 			var str = "";
 
-			foreach ( var field in t.GetFields( System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic ) )
+			var fields = t.GetFields( System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic );
+
+			var columnSize = fields.Max( x => x.Name.Length ) + 1;
+
+			if ( columnSize < 10 )
+				columnSize = 10;
+
+			foreach ( var field in fields )
 			{
-				str += $"{field.Name}:  \"{field.GetValue( strct )}\"\n";
+				var spaces = (columnSize - field.Name.Length);
+				if ( spaces < 0 ) spaces = 0;
+
+				str += $"{new String( ' ', spaces )}{field.Name}: {field.GetValue( strct )}\n";
 			}
 
 			return str.Trim( '\n' );
@@ -152,7 +204,16 @@ namespace Steamworks
 			//
 			if ( !ResultCallbacks.TryGetValue( result.AsyncCall, out var callbackInfo ) )
 			{
-				// Do we care? Should we throw errors?
+				//
+				// This can happen if the callback result was immediately available
+				// so we just returned that without actually going through the callback
+				// dance. It's okay for this to fail.
+				//
+
+				//
+				// But still let everyone know that this happened..
+				//
+				OnDebugCallback?.Invoke( (CallbackType)result.Callback, $"[no callback waiting/required]", false );
 				return;
 			}
 
@@ -203,7 +264,7 @@ namespace Steamworks
 		/// <summary>
 		/// Watch for a steam api call
 		/// </summary>
-		internal static void OnCallComplete( SteamAPICall_t call, Action continuation, bool server )
+		internal static void OnCallComplete<T>( SteamAPICall_t call, Action continuation, bool server ) where T : struct, ICallbackData
 		{
 			ResultCallbacks[call.Value] = new ResultCallback
 			{

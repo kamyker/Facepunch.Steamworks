@@ -25,13 +25,27 @@ namespace Steamworks
 
 		internal static void InstallEvents( bool server )
 		{
-			Dispatch.Install<DownloadItemResult_t>( x => OnDownloadItemResult?.Invoke( x ), server );
+			Dispatch.Install<DownloadItemResult_t>( x => OnDownloadItemResult?.Invoke( new DownloadItemResult(x) ), server );
 		}
 
 		/// <summary>
 		/// Posted after Download call
 		/// </summary>
-		public static event Action<DownloadItemResult_t> OnDownloadItemResult;
+		public static event Action<DownloadItemResult> OnDownloadItemResult;
+
+		public struct DownloadItemResult
+		{
+			internal DownloadItemResult( DownloadItemResult_t result )
+			{
+				AppID = result.AppID;
+				PublishedFileId = result.PublishedFileId;
+				Result = result.Result;
+			}
+
+			public AppId AppID { get; }
+			public PublishedFileId PublishedFileId { get; }
+			public Result Result { get; }
+		}
 
 		public static async Task<bool> DeleteFileAsync( PublishedFileId fileId )
 		{
@@ -79,7 +93,7 @@ namespace Steamworks
 			{
 				var downloadStarted = false;
 
-				Action<DownloadItemResult_t> onDownloadStarted = r =>
+				Action<DownloadItemResult> onDownloadStarted = r =>
 				{
 					if ( r.AppID == SteamClient.AppId && r.PublishedFileId == fileId )
 						downloadStarted = true;
@@ -147,18 +161,18 @@ namespace Steamworks
 			return item;
 		}
 
-		public static async Task<bool> StartPlaytimeTracking( PublishedFileId fileId )
+		public static async Task<bool> StartPlaytimeTracking(PublishedFileId fileId)
 		{
 			var result = await Internal.StartPlaytimeTracking(new[] {fileId}, 1);
 			return result.Value.Result == Result.OK;
 		}
-
-		public static async Task<bool> StopPlaytimeTracking( PublishedFileId fileId )
+		
+		public static async Task<bool> StopPlaytimeTracking(PublishedFileId fileId)
 		{
 			var result = await Internal.StopPlaytimeTracking(new[] {fileId}, 1);
 			return result.Value.Result == Result.OK;
 		}
-
+		
 		public static async Task<bool> StopPlaytimeTrackingForAllItems()
 		{
 			var result = await Internal.StopPlaytimeTrackingForAllItems();

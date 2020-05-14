@@ -96,7 +96,8 @@ namespace Steamworks
 		public static event Action<AppId, ulong, bool> OnMicroTxnAuthorizationResponse;
 
 		/// <summary>
-		/// Sent to your game in response to a steam://gamewebcallback/ command from a user clicking a link in the Steam overlay browser.
+		/// Sent to your game in response to a steam://gamewebcallback/(appid)/command/stuff command from a user clicking a 
+		/// link in the Steam overlay browser.
 		/// You can use this to add support for external site signups where you want to pop back into the browser after some web page 
 		/// signup sequence, and optionally get back some detail about that.
 		/// </summary>
@@ -260,6 +261,9 @@ namespace Steamworks
 			return (int)szWritten;
 		}
 
+		/// <summary>
+		/// Lazy version
+		/// </summary>
 		public static unsafe int DecompressVoice( byte[] from, System.IO.Stream output )
 		{
 			var to = Helpers.TakeBuffer( 1024 * 64 );
@@ -280,6 +284,22 @@ namespace Steamworks
 			// Copy to output buffer
 			//
 			output.Write( to, 0, (int)szWritten );
+			return (int)szWritten;
+		}
+
+		/// <summary>
+		/// Advanced and potentially fastest version - incase you know what you're doing
+		/// </summary>
+		public static unsafe int DecompressVoice( IntPtr from, int length, IntPtr to, int bufferSize )
+		{
+			if ( length <= 0 ) throw new ArgumentException( $"length should be > 0 " );
+			if ( bufferSize <= 0 ) throw new ArgumentException( $"bufferSize should be > 0 " );
+
+			uint szWritten = 0;
+
+			if ( Internal.DecompressVoice( from, (uint) length, to, (uint)bufferSize, ref szWritten, SampleRate ) != VoiceResult.OK )
+				return 0;
+			
 			return (int)szWritten;
 		}
 

@@ -14,6 +14,9 @@ namespace Steamworks.Ugc
 		internal SteamUGCDetails_t details;
 		internal PublishedFileId _id;
 
+		static HashSet<PublishedFileId> userFavoriteItems;
+		static Task favoriteItemsQuery;
+
 		public Item( PublishedFileId id ) : this()
 		{
 			_id = id;
@@ -230,16 +233,24 @@ namespace Steamworks.Ugc
 		/// </summary>
 		public async Task<bool> IsFavoriteAsync( )
 		{
-			return await IsFavoriteAsync( SteamClient.SteamId );
+			if ( favoriteItemsQuery != null )
+					await favoriteItemsQuery;
+
+			if ( userFavoriteItems == null )
+			{
+				favoriteItemsQuery = SaveFavoriteItems();
+				await favoriteItemsQuery;
+			}
+
+			return userFavoriteItems.Contains( Id );
 		}
 
-		/// <summary>
-		/// Queries all favorite items (of specified user) looking for this one.
-		/// </summary>
-		public async Task<bool> IsFavoriteAsync( SteamId userId )
+		async Task SaveFavoriteItems()
 		{
+			userFavoriteItems = new HashSet<PublishedFileId>();
+
 			var query = Steamworks.Ugc.Query.All
-											.WhereUserFavorited( userId )
+											.WhereUserFavorited( SteamClient.SteamId )
 											.WithOnlyIDs( true )
 											.WithDefaultStats( false );
 
@@ -251,24 +262,19 @@ namespace Steamworks.Ugc
 				var page = await query.GetPageAsync( pageId );
 
 				if ( !page.HasValue )
-					return false;
+					break;
 
 				using ( var pageValue = page.Value )
 				{
 					if ( pageValue.ResultCount == 0 )
-						return false;
+						break;
 
 					foreach ( var item in pageValue.Entries )
-					{
-						if ( item.Id == Id )
-							return true;
-					}
+						userFavoriteItems.Add( item.Id );
 				}
 
 				pageId++;
 			}
-
-			return false;
 		}
 
 		internal static Item From( SteamUGCDetails_t details )
@@ -327,9 +333,17 @@ namespace Steamworks.Ugc
         /// Adds item to user favorite list
         /// </summary>
 	    public async Task<bool> AddFavorite()
-	    {
-	        var result = await SteamUGC.Internal.AddItemToFavorites(details.ConsumerAppID, _id);
-	        return result?.Result == Result.OK;
+		{
+			if ( favoriteItemsQuery != null )
+				await favoriteItemsQuery;
+
+			var result = await SteamUGC.Internal.AddItemToFavorites(details.ConsumerAppID, _id);
+			bool added = result?.Result == Result.OK;
+
+			if ( added && userFavoriteItems != null )
+				userFavoriteItems.Add( Id );
+
+			return added;
 	    }
 
 	    /// <summary>
@@ -337,8 +351,17 @@ namespace Steamworks.Ugc
 	    /// </summary>
         public async Task<bool> RemoveFavorite()
 	    {
-	        var result = await SteamUGC.Internal.RemoveItemFromFavorites(details.ConsumerAppID, _id);
-	        return result?.Result == Result.OK;
+			if ( favoriteItemsQuery != null )
+				await favoriteItemsQuery;
+
+			var result = await SteamUGC.Internal.RemoveItemFromFavorites(details.ConsumerAppID, _id);
+
+			bool removed = result?.Result == Result.OK;
+
+			if ( removed && userFavoriteItems != null )
+				userFavoriteItems.Remove( Id );
+
+			return removed;
 	    }
 
         /// <summary>

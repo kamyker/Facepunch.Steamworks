@@ -224,6 +224,51 @@ namespace Steamworks.Ugc
 			file.Value.Dispose();
 			return item;
 		}
+
+		/// <summary>
+		/// Queries all favorite items (of current user) looking for this one.
+		/// </summary>
+		public async Task<bool> IsFavoriteAsync( )
+		{
+			return await IsFavoriteAsync( SteamClient.SteamId );
+		}
+
+		/// <summary>
+		/// Queries all favorite items (of specified user) looking for this one.
+		/// </summary>
+		public async Task<bool> IsFavoriteAsync( SteamId userId )
+		{
+			var query = Steamworks.Ugc.Query.All
+											.WhereUserFavorited( userId )
+											.WithOnlyIDs( true )
+											.WithDefaultStats( false );
+
+			var cancelation = new CancellationTokenSource( TimeSpan.FromMinutes(1) );
+			int pageId = 1;
+
+			while ( !cancelation.IsCancellationRequested )
+			{
+				var page = await query.GetPageAsync( pageId );
+
+				if ( !page.HasValue )
+					return false;
+
+				using ( var pageValue = page.Value )
+				{
+					if ( pageValue.ResultCount == 0 )
+						return false;
+
+					foreach ( var item in pageValue.Entries )
+					{
+						if ( item.Id == Id )
+							return true;
+					}
+				}
+
+				pageId++;
+			}
+
+			return false;
 		}
 
 		internal static Item From( SteamUGCDetails_t details )

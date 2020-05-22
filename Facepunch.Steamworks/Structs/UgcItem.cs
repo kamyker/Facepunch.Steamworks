@@ -241,6 +241,7 @@ namespace Steamworks.Ugc
 			{
 				favoriteItemsQuery = SaveFavoriteItems();
 				await favoriteItemsQuery;
+				favoriteItemsQuery = null;
 			}
 
 			return userFavoriteItems.Contains( Id );

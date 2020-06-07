@@ -235,7 +235,7 @@ namespace Steamworks.Ugc
 		public async Task<bool> IsFavoriteAsync( )
 		{
 			if ( favoriteItemsQuery != null )
-					await favoriteItemsQuery;
+				await favoriteItemsQuery;
 
 			if ( userFavoriteItems == null )
 			{

@@ -35,12 +35,10 @@ namespace Steamworks
 
 		private static void InventoryUpdated( SteamInventoryFullUpdate_t x )
 		{
-			using ( var r = new InventoryResult( x.Handle, false ) )
-			{
-				Items = r.GetItems( false );
+			var r = new InventoryResult( x.Handle, false );
+			Items = r.GetItems( false );
 
-				OnInventoryUpdated?.Invoke( r );
-			}
+			OnInventoryUpdated?.Invoke( r );
 		}
 
 		public static event Action<InventoryResult> OnInventoryUpdated;

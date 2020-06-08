@@ -211,7 +211,7 @@ namespace Steamworks.Ugc
 			}
 		}
 
-		internal ItemState State => (ItemState) SteamUGC.Internal.GetItemState( Id );
+		private ItemState State => (ItemState) SteamUGC.Internal.GetItemState( Id );
 
 		public static async Task<Item?> GetAsync( PublishedFileId id, int maxageseconds = 60 * 30 )
 		{
@@ -425,10 +425,15 @@ namespace Steamworks.Ugc
 		public ulong NumSecondsPlayedDuringTimePeriod { get; internal set; }
 		public ulong NumPlaytimeSessionsDuringTimePeriod { get; internal set; }
 
-        /// <summary>
-        /// The URL to the preview image for this item
-        /// </summary>
-        public string PreviewImageUrl { get; internal set; }
+		/// <summary>
+		/// The URL to the preview image for this item
+		/// </summary>
+		public string PreviewImageUrl { get; internal set; }
+
+		/// <summary>
+		/// The metadata string for this item, only available from queries WithMetadata(true)
+		/// </summary>
+		public string Metadata { get; internal set; }
 
 		/// <summary>
 		/// Edit this item

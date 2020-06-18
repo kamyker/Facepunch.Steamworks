@@ -239,7 +239,7 @@ namespace Steamworks.Ugc
 
 			if ( userFavoriteItems == null )
 			{
-				favoriteItemsQuery = SaveFavoriteItems();
+				favoriteItemsQuery = CacheFavoriteItems();
 				await favoriteItemsQuery;
 				favoriteItemsQuery = null;
 			}
@@ -247,7 +247,7 @@ namespace Steamworks.Ugc
 			return userFavoriteItems.Contains( Id );
 		}
 
-		async Task SaveFavoriteItems()
+		async static Task CacheFavoriteItems()
 		{
 			userFavoriteItems = new HashSet<PublishedFileId>();
 

@@ -16,8 +16,6 @@ namespace Steamworks
 	{
 		public ISocketManager Interface { get; set; }
 
-		public List<Connection> Connecting = new List<Connection>();
-		public List<Connection> Connected = new List<Connection>();
 		public Socket Socket { get; internal set; }
 
 		public override string ToString() => Socket.ToString();
@@ -46,33 +44,17 @@ namespace Steamworks
 		{
 			switch ( info.State )
 			{
+				case ConnectionState.None:
+					break;
 				case ConnectionState.Connecting:
-					if ( !Connecting.Contains( connection ) )
-					{
-						Connecting.Add( connection );
-
-						OnConnecting( connection, info );
-					}
+					OnConnecting( connection, info );
 					break;
 				case ConnectionState.Connected:
-					if ( !Connected.Contains( connection ) )
-					{
-						Connecting.Remove( connection );
-						Connected.Add( connection );
-
-						OnConnected( connection, info );
-					}
+					OnConnected( connection, info );
 					break;
 				case ConnectionState.ClosedByPeer:
 				case ConnectionState.ProblemDetectedLocally:
-				case ConnectionState.None:
-					if ( Connecting.Contains( connection ) || Connected.Contains( connection ) )
-					{
-						Connecting.Remove( connection );
-						Connected.Remove( connection );
-
-						OnDisconnected( connection, info );
-					}
+					OnDisconnected( connection, info );
 					break;
 			}
 		}
@@ -107,8 +89,6 @@ namespace Steamworks
 		/// </summary>
 		public virtual void OnDisconnected( Connection connection, ConnectionInfo info )
 		{
-			SteamNetworkingSockets.Internal.SetConnectionPollGroup( connection, 0 );
-
 			if ( Interface != null )
 			{
 				Interface.OnDisconnected( connection, info );

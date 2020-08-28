@@ -116,6 +116,11 @@ namespace Steamworks.Ugc
 		/// </summary>
 		public PublishedFileId[] Children;
 
+		/// <summary>
+		/// Additional previews of this item or collection, available only from WithAdditionalPreviews(true) queries
+		/// </summary>
+		public UgcAdditionalPreview[] AdditionalPreviews { get; internal set; }
+
         public bool IsInstalled => (State & ItemState.Installed) == ItemState.Installed;
 		public bool IsDownloading => (State & ItemState.Downloading) == ItemState.Downloading;
 		public bool IsDownloadPending => (State & ItemState.DownloadPending) == ItemState.DownloadPending;

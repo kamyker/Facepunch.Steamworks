@@ -1,4 +1,4 @@
-# Facepunch.Steamworks
+# Facepunch.Steamworks for Unity
 [Another fucking c# Steamworks implementation](https://wiki.facepunch.com/steamworks/)
 
 ## Installation:

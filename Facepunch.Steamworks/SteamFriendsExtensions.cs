@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Steamworks.Data;
 
 namespace Steamworks
 {
@@ -25,9 +20,9 @@ namespace Steamworks
 
 				void SteamFriends_OnPersonaStateChange( Friend friendChanged )
 				{
-					SteamFriends.OnPersonaStateChange -= SteamFriends_OnPersonaStateChange;
 					if ( playerId == friendChanged.Id )
 					{
+						SteamFriends.OnPersonaStateChange -= SteamFriends_OnPersonaStateChange;
 						onRetrived?.Invoke( friendChanged.Name );
 					}
 				}

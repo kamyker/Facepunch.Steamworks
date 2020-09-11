@@ -6,7 +6,7 @@
 
 **Easy way:**
 Add 
- `"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.git"` 
+ `"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.Package.git"` 
 to 
 `<your_project>/Packages/manifest.json` 
 dependencies

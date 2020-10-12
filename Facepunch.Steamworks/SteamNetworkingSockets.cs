@@ -12,6 +12,25 @@ namespace Steamworks
 	{
 		internal static ISteamNetworkingSockets Internal => Interface as ISteamNetworkingSockets;
 
+		/// <summary>
+		/// Get the identity assigned to this interface.
+		/// E.g. on Steam, this is the user's SteamID, or for the gameserver interface, the SteamID assigned
+		/// to the gameserver.  Returns false and sets the result to an invalid identity if we don't know
+		/// our identity yet.  (E.g. GameServer has not logged in.  On Steam, the user will know their SteamID
+		/// even if they are not signed into Steam.)
+		/// </summary>
+		public static NetIdentity Identity
+		{
+			get
+			{
+				NetIdentity identity = default;
+
+				Internal.GetIdentity( ref identity );
+
+				return identity;
+			}
+		}
+
 		internal override void InitializeInterface( bool server )
 		{
 			SetInterface( server, new ISteamNetworkingSockets( server ) );
@@ -215,6 +234,25 @@ namespace Steamworks
 			NetIdentity identity = serverId;
 			var options = Array.Empty<NetKeyValue>();
 			t.Connection = Internal.ConnectP2P( ref identity, virtualport, options.Length, options );
+			SetConnectionManager( t.Connection.Id, t );
+			return t;
+		}
+
+		/// <summary>
+		/// Connect to a relay server
+		/// </summary>
+		public static ConnectionManager ConnectRelay( SteamId serverId, int virtualport, IConnectionManager iface )
+		{
+			NetIdentity identity = serverId;
+			var options = Array.Empty<NetKeyValue>();
+			var connection = Internal.ConnectP2P( ref identity, virtualport, options.Length, options );
+
+			var t = new ConnectionManager
+			{
+				Connection = connection,
+				Interface = iface
+			};
+
 			SetConnectionManager( t.Connection.Id, t );
 			return t;
 		}

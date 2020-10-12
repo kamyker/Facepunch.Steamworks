@@ -681,7 +681,7 @@ namespace Steamworks
 	//
 	// EOverlayToStoreFlag
 	//
-	internal enum OverlayToStoreFlag : int
+	public enum OverlayToStoreFlag : int
 	{
 		None = 0,
 		AddToCart = 1,
@@ -747,6 +747,17 @@ namespace Steamworks
 	{
 		SingleLine = 0,
 		MultipleLines = 1,
+	}
+	
+	//
+	// ETextFilteringContext
+	//
+	internal enum TextFilteringContext : int
+	{
+		Unknown = 0,
+		GameContent = 1,
+		Chat = 2,
+		Name = 3,
 	}
 	
 	//
@@ -1863,7 +1874,7 @@ namespace Steamworks
 	//
 	// EItemPreviewType
 	//
-	internal enum ItemPreviewType : int
+	public enum ItemPreviewType : int
 	{
 		Image = 0,
 		YouTubeVideo = 1,
@@ -2003,6 +2014,7 @@ namespace Steamworks
 		Misc_NoRelaySessionsToClient = 5006,
 		Misc_P2P_Rendezvous = 5008,
 		Misc_P2P_NAT_Firewall = 5009,
+		Misc_PeerSentNoConnection = 5010,
 		Misc_Max = 5999,
 	}
 	
@@ -2041,7 +2053,7 @@ namespace Steamworks
 		Int64 = 2,
 		Float = 3,
 		String = 4,
-		FunctionPtr = 5,
+		Ptr = 5,
 	}
 	
 	//
@@ -2071,6 +2083,13 @@ namespace Steamworks
 		MTU_DataSize = 33,
 		Unencrypted = 34,
 		EnumerateDevVars = 35,
+		SymmetricConnect = 37,
+		LocalVirtualPort = 38,
+		Callback_ConnectionStatusChanged = 201,
+		Callback_AuthStatusChanged = 202,
+		Callback_RelayNetworkStatusChanged = 203,
+		Callback_MessagesSessionRequest = 204,
+		Callback_MessagesSessionFailed = 205,
 		P2P_STUN_ServerList = 103,
 		P2P_Transport_ICE_Enable = 104,
 		P2P_Transport_ICE_Penalty = 105,

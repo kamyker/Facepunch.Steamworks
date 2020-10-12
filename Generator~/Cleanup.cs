@@ -16,6 +16,8 @@ public static class Cleanup
 		type = type.Replace( "unsigned long long", "uint64" );
 		type = type.Replace( "unsigned int", "uint" );
 		type = type.Replace( "uint32", "uint" );
+		type = type.Replace( "int32_t", "int" );
+		type = type.Replace( "int64_t", "long" );
 
 		type = type.Replace( "CSteamID", "SteamId" );
 		type = type.Replace( "CGameID", "GameId" );
@@ -101,6 +103,7 @@ public static class Cleanup
 		if ( type == "CCallbackBase" ) return false;
 		if ( type == "CSteamGameServerAPIContext" ) return false;
 		if ( type == "ConnectionStatus") return false;
+		if ( type.StartsWith( "FnSteam" ) ) return false;
 
 		return true;
 	}
@@ -139,6 +142,8 @@ public static class Cleanup
 		if ( name == "NetIdentity" ) return "public";
 		if ( name == "NetAddress" ) return "public";
 		if ( name == "NetDebugOutput" ) return "public";
+		if ( name == "ItemPreviewType" ) return "public";
+		if ( name == "OverlayToStoreFlag" ) return "public";
 
 		return "internal";
 	}

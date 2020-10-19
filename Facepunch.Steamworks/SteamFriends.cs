@@ -400,5 +400,16 @@ namespace Steamworks
 		{
 			return Internal.SendClanChatMessage( chatId, message );
 		}
+
+		public static bool OpenClanChatWindowInSteam( SteamId chatId )
+		{
+			return Internal.OpenClanChatWindowInSteam( chatId );
+		}
+
+		public static bool CloseClanChatWindowInSteam( SteamId chatId )
+		{
+			return Internal.CloseClanChatWindowInSteam( chatId );
+		}
+
 	}
 }

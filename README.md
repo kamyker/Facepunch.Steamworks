@@ -5,11 +5,11 @@
 1. Adding plugin
 
 **Easy way:**
-Add 
- `"facepunch.steamworks": "https://github.com/kamyker/Facepunch.Steamworks.Package.git"` 
-to 
-`<your_project>/Packages/manifest.json` 
-dependencies
+In Unity click Window/Package Manager then:
+
+ ![click top left plus icon](https://i.gyazo.com/2dc801f40193f36798812bcaff4ea2ee.png)
+ 
+and copy/paste: `https://github.com/kamyker/Facepunch.Steamworks.Package.git` 
 
 **Git way:**
 Clone repo as submodule to `<your_project>/Packages/Facepunch.Steamworks`

@@ -26,5 +26,14 @@ namespace Steamworks.Ugc
 			return null;
 		}
 
+		public static bool IsCurrentPlayerTheOwner( this Item item )
+		{
+			return item.Owner.Id == SteamClient.SteamId;
+		}
+		
+		public static Query GetQuery( this Item item )
+		{
+			return Query.All.WithFileId(item.Id);
+		}
 	}
 }

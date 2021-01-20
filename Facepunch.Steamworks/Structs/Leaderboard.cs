@@ -18,6 +18,7 @@ namespace Steamworks.Data
 		public LeaderboardSort Sort => SteamUserStats.Internal.GetLeaderboardSortMethod( Id );
 		public LeaderboardDisplay Display => SteamUserStats.Internal.GetLeaderboardDisplayType( Id );
 		public int EntryCount => SteamUserStats.Internal.GetLeaderboardEntryCount(Id);
+		public ulong SteamId => Id;
 
 		static int[] detailsBuffer = new int[64];
 		static int[] noDetails = Array.Empty<int>();

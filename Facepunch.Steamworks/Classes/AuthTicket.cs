@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Steamworks
 {
@@ -25,6 +26,18 @@ namespace Steamworks
 		public void Dispose()
 		{
 			Cancel();
+		}
+		
+		/// <summary>
+		/// Converts the ticket from binary to hex string. Can be used with ISteamUserAuth.AuthenticateUserTicket webapi.
+		/// </summary>
+		/// <returns></returns>
+		public string ToHexString()
+		{
+			var sb = new StringBuilder();
+			foreach ( byte b in Data )
+				sb.AppendFormat( "{0:x2}", b );
+			return  sb.ToString();
 		}
 	}
 }

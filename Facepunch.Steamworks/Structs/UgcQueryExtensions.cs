@@ -21,5 +21,16 @@ namespace Steamworks.Ugc
                 return result.Value.Entries.First();
             }
         }
+        
+        public static async Task<Item?> FirstOrNullAsync3Times( this Query q )
+        {
+            for ( int i = 0; i < 3; i++ )
+            {
+                var res = await q.FirstOrNullAsync();
+                if ( res.HasValue )
+                    return res;
+            }
+            return null;
+        }
     }
 }

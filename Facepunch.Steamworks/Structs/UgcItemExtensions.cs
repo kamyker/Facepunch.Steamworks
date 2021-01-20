@@ -26,6 +26,22 @@ namespace Steamworks.Ugc
 			return null;
 		}
 
+		public static async Task<string> GetPreviewImageOrAdditionalPreviewImageUrl( this SmartItem item )
+		{
+			if ( !string.IsNullOrEmpty( item.PreviewImageUrl ) )
+				return item.PreviewImageUrl;
+			var additional = await item.AdditionalPreviews();
+			if ( additional != null )
+			{
+				foreach ( var p in additional )
+				{
+					if ( p.ItemPreviewType == ItemPreviewType.Image && !string.IsNullOrEmpty( p.UrlOrVideoID ) )
+						return p.UrlOrVideoID;
+				}
+			}
+			return null;
+		}
+		
 		public static bool IsCurrentPlayerTheOwner( this Item item )
 		{
 			return item.Owner.Id == SteamClient.SteamId;

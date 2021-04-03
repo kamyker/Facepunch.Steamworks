@@ -16,93 +16,43 @@ namespace Steamworks.Ugc
 		AppId creatorApp;
         string searchText;
 
-		public Query( UgcType type ) : this()
+        Query( UgcType type ) : this()
+        {
+	        matchingType = type;
+        }
+        
+		public Query( UgcType type = UgcType.All, UGCQuery allRankedBy = UGCQuery.RankedByVote, string optionalSearchText = null ) : this(type)
 		{
-			matchingType = type;
+			queryType = allRankedBy;
+			if(!string.IsNullOrEmpty( optionalSearchText ))
+			searchText = optionalSearchText; 
 		}
-
-		public static Query All => new Query( UgcType.All );
-		public static Query Items => new Query( UgcType.Items );
-		public static Query ItemsMtx => new Query( UgcType.Items_Mtx );
-		public static Query ItemsReadyToUse => new Query( UgcType.Items_ReadyToUse );
-		public static Query Collections => new Query( UgcType.Collections );
-		public static Query Artwork => new Query( UgcType.Artwork );
-		public static Query Videos => new Query( UgcType.Videos );
-		public static Query Screenshots => new Query( UgcType.Screenshots );
-		public static Query AllGuides => new Query( UgcType.AllGuides );
-		public static Query WebGuides => new Query( UgcType.WebGuides );
-		public static Query IntegratedGuides => new Query( UgcType.IntegratedGuides );
-		public static Query UsableInGame => new Query( UgcType.UsableInGame );
-		public static Query ControllerBindings => new Query( UgcType.ControllerBindings );
-		public static Query GameManagedItems => new Query( UgcType.GameManagedItems );
-
-
-		public Query RankedByVote() { queryType = UGCQuery.RankedByVote; return this; }
-		public Query RankedByPublicationDate() { queryType = UGCQuery.RankedByPublicationDate; return this; }
-		public Query RankedByAcceptanceDate() { queryType = UGCQuery.AcceptedForGameRankedByAcceptanceDate; return this; }
-		public Query RankedByTrend() { queryType = UGCQuery.RankedByTrend; return this; }
-		public Query FavoritedByFriends() { queryType = UGCQuery.FavoritedByFriendsRankedByPublicationDate; return this; }
-		public Query CreatedByFriends() { queryType = UGCQuery.CreatedByFriendsRankedByPublicationDate; return this; }
-		public Query RankedByNumTimesReported() { queryType = UGCQuery.RankedByNumTimesReported; return this; }
-		public Query CreatedByFollowedUsers() { queryType = UGCQuery.CreatedByFollowedUsersRankedByPublicationDate; return this; }
-		public Query NotYetRated() { queryType = UGCQuery.NotYetRated; return this; }
-		public Query RankedByTotalVotesAsc() { queryType = UGCQuery.RankedByTotalVotesAsc; return this; }
-		public Query RankedByVotesUp() { queryType = UGCQuery.RankedByVotesUp; return this; }
-		public Query RankedByTextSearch() { queryType = UGCQuery.RankedByTextSearch; return this; }
-		public Query RankedByTotalUniqueSubscriptions() { queryType = UGCQuery.RankedByTotalUniqueSubscriptions; return this; }
-		public Query RankedByPlaytimeTrend() { queryType = UGCQuery.RankedByPlaytimeTrend; return this; }
-		public Query RankedByTotalPlaytime() { queryType = UGCQuery.RankedByTotalPlaytime; return this; }
-		public Query RankedByAveragePlaytimeTrend() { queryType = UGCQuery.RankedByAveragePlaytimeTrend; return this; }
-		public Query RankedByLifetimeAveragePlaytime() { queryType = UGCQuery.RankedByLifetimeAveragePlaytime; return this; }
-		public Query RankedByPlaytimeSessionsTrend() { queryType = UGCQuery.RankedByPlaytimeSessionsTrend; return this; }
-		public Query RankedByLifetimePlaytimeSessions() { queryType = UGCQuery.RankedByLifetimePlaytimeSessions; return this; }
-
-		#region UserQuery
-
-		SteamId? steamid;
-
-		UserUGCList userType;
-		UserUGCListSortOrder userSort;
-
-		internal Query LimitUser( SteamId steamid )
+		
+		public Query( UgcType type = UgcType.All,
+		              UserUGCList userQueryType = UserUGCList.Published,
+		              UserUGCListSortOrder userSortType = UserUGCListSortOrder.CreationOrderDesc,
+		              SteamId user = default ) : this(type)
 		{
-			if ( steamid.Value == 0 )
+			userType = userQueryType;
+			userSort = userSortType;
+			steamid = user;
+			if ( steamid == 0 )
 				steamid = SteamClient.SteamId;
-
-			this.steamid = steamid;
-			return this;
 		}
-
-		public Query WhereUserPublished( SteamId user = default ) { userType = UserUGCList.Published; LimitUser( user ); return this; }
-		public Query WhereUserVotedOn( SteamId user = default ) { userType = UserUGCList.VotedOn; LimitUser( user ); return this; }
-		public Query WhereUserVotedUp( SteamId user = default ) { userType = UserUGCList.VotedUp; LimitUser( user ); return this; }
-		public Query WhereUserVotedDown( SteamId user = default ) { userType = UserUGCList.VotedDown; LimitUser( user ); return this; }
-		public Query WhereUserWillVoteLater( SteamId user = default ) { userType = UserUGCList.WillVoteLater; LimitUser( user ); return this; }
-		public Query WhereUserFavorited( SteamId user = default ) { userType = UserUGCList.Favorited; LimitUser( user ); return this; }
-		public Query WhereUserSubscribed( SteamId user = default ) { userType = UserUGCList.Subscribed; LimitUser( user ); return this; }
-		public Query WhereUserUsedOrPlayed( SteamId user = default ) { userType = UserUGCList.UsedOrPlayed; LimitUser( user ); return this; }
-		public Query WhereUserFollowed( SteamId user = default ) { userType = UserUGCList.Followed; LimitUser( user ); return this; }
-
-		public Query SortByCreationDate() { userSort = UserUGCListSortOrder.CreationOrderDesc; return this; }
-		public Query SortByCreationDateAsc() { userSort = UserUGCListSortOrder.CreationOrderAsc; return this; }
-		public Query SortByTitleAsc() { userSort = UserUGCListSortOrder.TitleAsc; return this; }
-		public Query SortByUpdateDate() { userSort = UserUGCListSortOrder.LastUpdatedDesc; return this; }
-		public Query SortBySubscriptionDate() { userSort = UserUGCListSortOrder.SubscriptionDateDesc; return this; }
-		public Query SortByVoteScore() { userSort = UserUGCListSortOrder.VoteScoreDesc; return this; }
-		public Query SortByModeration() { userSort = UserUGCListSortOrder.ForModeration; return this; }
-
-        public Query WhereSearchText(string searchText) { this.searchText = searchText; return this; }
-
+		
+		public Query( UgcType type, params PublishedFileId[] files ) : this(type)
+		{
+			Files = files;
+		}
+		
+		#region UserQuery
+		SteamId? steamid;
+		readonly UserUGCList userType;
+		readonly UserUGCListSortOrder userSort;
 		#endregion
 
 		#region Files
-		PublishedFileId[] Files;
-
-		public Query WithFileId( params PublishedFileId[] files )
-		{
-			Files = files;
-			return this;
-		}
+		readonly PublishedFileId[] Files;
 		#endregion
 
 		public async Task<ResultPage?> GetPageAsync( int page )

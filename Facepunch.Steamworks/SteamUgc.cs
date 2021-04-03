@@ -165,9 +165,7 @@ namespace Steamworks
 		/// </summary>
 		public static async Task<Ugc.Item?> QueryFileAsync( PublishedFileId fileId )
 		{
-			var result = await Ugc.Query.All
-									.WithFileId( fileId )
-									.GetPageAsync( 1 );
+			var result = await new Ugc.Query( UgcType.All, fileId ).GetPageAsync( 1 );
 
 			if ( !result.HasValue || result.Value.ResultCount != 1 )
 				return null;

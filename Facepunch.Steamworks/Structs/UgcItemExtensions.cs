@@ -49,7 +49,7 @@ namespace Steamworks.Ugc
 		
 		public static Query GetQuery( this Item item )
 		{
-			return Query.All.WithFileId(item.Id);
+			return new Query(UgcType.All, item.Id);
 		}
 	}
 }

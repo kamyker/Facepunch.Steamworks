@@ -46,13 +46,16 @@ namespace Steamworks.Ugc
 							item.NumComments = GetStat( i, ItemStatistic.NumComments );
 							item.NumSecondsPlayedDuringTimePeriod = GetStat( i, ItemStatistic.NumSecondsPlayedDuringTimePeriod );
 							item.NumPlaytimeSessionsDuringTimePeriod = GetStat( i, ItemStatistic.NumPlaytimeSessionsDuringTimePeriod );
+							item.AreDefaultStatsPulled = true;
 						}
 
-						if ( SteamUGC.Internal.GetQueryUGCPreviewURL( Handle, i, out string preview ) )
+						if ( SteamUGC.Internal.GetQueryUGCPreviewURL( Handle, i, out string preview ) ) 
+							//returns true even when there's no img attached and even WithOnlyIds(true)
+							//returns correct url even with WithOnlyIds(true)
 						{
 							item.PreviewImageUrl = preview;
 						}
-
+						
 						if ( ReturnsKeyValueTags )
 						{
 							var keyValueTagsCount = SteamUGC.Internal.GetQueryUGCNumKeyValueTags( Handle, i );
@@ -66,6 +69,7 @@ namespace Steamworks.Ugc
 							}
 						}
 
+						item.Metadata = string.Empty;
 						if (ReturnsMetadata)
 						{
 							string metadata;
@@ -88,20 +92,18 @@ namespace Steamworks.Ugc
 						if ( ReturnsAdditionalPreviews )
 						{
 							var previewsCount = SteamUGC.Internal.GetQueryUGCNumAdditionalPreviews( Handle, i );
-							if ( previewsCount > 0 )
+							item.AdditionalPreviews = new UgcAdditionalPreview[previewsCount];
+							
+							for ( uint j = 0; j < previewsCount; j++ )
 							{
-								item.AdditionalPreviews = new UgcAdditionalPreview[previewsCount];
-								for ( uint j = 0; j < previewsCount; j++ )
+								string previewUrlOrVideo;
+								string originalFileName; //what is this???
+								ItemPreviewType previewType = default;
+								if ( SteamUGC.Internal.GetQueryUGCAdditionalPreview(
+									Handle, i, j, out previewUrlOrVideo, out originalFileName, ref previewType ) )
 								{
-									string previewUrlOrVideo;
-									string originalFileName; //what is this???
-									ItemPreviewType previewType = default;
-									if ( SteamUGC.Internal.GetQueryUGCAdditionalPreview(
-										Handle, i, j, out previewUrlOrVideo, out originalFileName, ref previewType ) )
-									{
-										item.AdditionalPreviews[j] = new UgcAdditionalPreview( 
-											previewUrlOrVideo, originalFileName, previewType );
-									}
+									item.AdditionalPreviews[j] = new UgcAdditionalPreview( 
+										previewUrlOrVideo, originalFileName, previewType );
 								}
 							}
 						}

@@ -1771,7 +1771,7 @@ namespace Steamworks
 	//
 	// EUserUGCList
 	//
-	internal enum UserUGCList : int
+	public enum UserUGCList : int
 	{
 		Published = 0,
 		VotedOn = 1,
@@ -1787,7 +1787,7 @@ namespace Steamworks
 	//
 	// EUserUGCListSortOrder
 	//
-	internal enum UserUGCListSortOrder : int
+	public enum UserUGCListSortOrder : int
 	{
 		CreationOrderDesc = 0,
 		CreationOrderAsc = 1,
@@ -1801,7 +1801,7 @@ namespace Steamworks
 	//
 	// EUGCQuery
 	//
-	internal enum UGCQuery : int
+	public enum UGCQuery : int
 	{
 		RankedByVote = 0,
 		RankedByPublicationDate = 1,

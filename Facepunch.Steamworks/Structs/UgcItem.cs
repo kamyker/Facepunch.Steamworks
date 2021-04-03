@@ -224,17 +224,17 @@ namespace Steamworks.Ugc
 
 		public static async Task<Item?> GetAsync( PublishedFileId id, int maxageseconds = 60 * 30 )
 		{
-			var file = await Steamworks.Ugc.Query.All
-											.WithFileId( id )
-											.WithLongDescription( true )
-											.GetPageAsync( 1 );
-
-			if ( !file.HasValue ) return null;
-			using ( file.Value )
+			using ( var file = await new Query( UgcType.All, id )
+				.WithLongDescription( true )
+				.GetPageAsync( 1 ) )
 			{
-				if ( file.Value.ResultCount == 0 ) return null;
+				if ( !file.HasValue ) return null;
+				using ( file.Value )
+				{
+					if ( file.Value.ResultCount == 0 ) return null;
 
-				return file.Value.Entries.First();
+					return file.Value.Entries.First();
+				}
 			}
 		}
 
@@ -260,8 +260,7 @@ namespace Steamworks.Ugc
 		{
 			userFavoriteItems = new HashSet<PublishedFileId>();
 
-			var query = Steamworks.Ugc.Query.All
-											.WhereUserFavorited( SteamClient.SteamId )
+			var query = new Query(UgcType.All, UserUGCList.Favorited)
 											.WithOnlyIDs( true )
 											.WithDefaultStats( false );
 
@@ -433,6 +432,7 @@ namespace Steamworks.Ugc
 		public ulong NumComments { get; internal set; }
 		public ulong NumSecondsPlayedDuringTimePeriod { get; internal set; }
 		public ulong NumPlaytimeSessionsDuringTimePeriod { get; internal set; }
+		public bool AreDefaultStatsPulled { get; internal set; }
 
 		/// <summary>
 		/// The URL to the preview image for this item

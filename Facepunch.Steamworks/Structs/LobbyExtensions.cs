@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using System.IO;
 using System.Text;
+using UnityEngine;
+using CompressionLevel = System.IO.Compression.CompressionLevel;
 
 namespace Steamworks.Data
 {
@@ -33,13 +35,18 @@ namespace Steamworks.Data
 				throw new System.ArgumentException( "Key should be < 255 chars", nameof( key ) );
 
 			value = Compress( value );
-
+			
 			if ( value.Length > 8192 )
 				throw new System.ArgumentException( "Value should be < 8192 chars", nameof( key ) );
 
 			return SteamMatchmaking.Internal.SetLobbyData( lobby.Id, key, value );
 		}
 
+		public static bool IsOwnedByLocalClient( this Lobby lobby )
+		{
+			return lobby.IsOwnedBy(SteamClient.SteamId);
+		}
+		
 		public static string Compress( string uncompressedString )
 		{
 			byte[] compressedBytes;

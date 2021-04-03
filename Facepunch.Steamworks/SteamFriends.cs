@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Steamworks.Data;
 
@@ -256,12 +257,15 @@ namespace Steamworks
 
 			await Task.Delay( 100 );
 
-			while ( RequestUserInformation( steamid, nameonly ) )
+			using ( CancellationTokenSource tokenTimeout = new CancellationTokenSource( TimeSpan.FromSeconds( 5 ) ) )
 			{
-				await Task.Delay( 50 );
+				while ( RequestUserInformation( steamid, nameonly ) && !tokenTimeout.IsCancellationRequested )
+				{
+					await Task.Delay( 50 );
+				}
 			}
 
-			//
+		//
 			// And extra wait here seems to solve avatars loading as [?]
 			//
 			await Task.Delay( 500 );

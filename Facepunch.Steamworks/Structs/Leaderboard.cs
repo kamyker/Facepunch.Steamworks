@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Steamworks.Data
@@ -140,20 +141,23 @@ namespace Steamworks.Data
 
 		internal static async Task WaitForUserNames( LeaderboardEntry[] entries)
 		{
-			bool gotAll = false;
-			while ( !gotAll )
+			using ( CancellationTokenSource tokenTimeout = new CancellationTokenSource( TimeSpan.FromSeconds( 5 ) ) )
 			{
-				gotAll = true;
-
-				foreach ( var entry in entries )
+				bool gotAll = false;
+				while ( !gotAll && !tokenTimeout.IsCancellationRequested )
 				{
-					if ( entry.User.Id == 0 ) continue;
-					if ( !SteamFriends.Internal.RequestUserInformation( entry.User.Id, true ) ) continue;
+					gotAll = true;
 
-					gotAll = false;
+					foreach ( var entry in entries )
+					{
+						if ( entry.User.Id == 0 ) continue;
+						if ( !SteamFriends.Internal.RequestUserInformation( entry.User.Id, true ) ) continue;
+
+						gotAll = false;
+					}
+
+					await Task.Delay( 1 );
 				}
-
-				await Task.Delay( 1 );
 			}
 		}
 		#endregion

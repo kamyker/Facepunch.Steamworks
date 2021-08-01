@@ -222,11 +222,14 @@ namespace Steamworks.Ugc
 
 		internal ItemState State => (ItemState) SteamUGC.Internal.GetItemState( Id );
 
-		public static async Task<Item?> GetAsync( PublishedFileId id, int maxageseconds = 60 * 30 )
+		public static async Task<Item?> GetAsync( PublishedFileId id, bool withLongDescription = true, int maxAgeSeconds = 0 )
 		{
-			using ( var file = await new Query( UgcType.All, id )
-				.WithLongDescription( true )
-				.GetPageAsync( 1 ) )
+			var q = new Query( UgcType.All, id )
+				.WithLongDescription( withLongDescription );
+			if(maxAgeSeconds > 0)
+				q = q.AllowCachedResponse(maxAgeSeconds);
+			
+			using ( var file = await q.GetPageAsync( 1 ) )
 			{
 				if ( !file.HasValue ) return null;
 				using ( file.Value )

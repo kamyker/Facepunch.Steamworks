@@ -190,12 +190,9 @@ namespace Steamworks.Ugc
 
 		internal ItemState State => Item.State;
 
-		public static async Task<Item?> GetAsync( PublishedFileId id, int maxageseconds = 60 * 30 )
+		public static async Task<Item?> GetAsync( PublishedFileId id, bool withLongDescription = true, int maxAgeSeconds = 0  )
 		{
-			var i = await Item.GetAsync( id, maxageseconds );
-			if(i.HasValue) 
-				return i.Value;
-			return null;
+			return await Item.GetAsync( id, withLongDescription, maxAgeSeconds );
 		}
 
 		/// <summary>
